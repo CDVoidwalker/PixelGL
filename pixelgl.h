@@ -253,13 +253,13 @@ __HIDDEN__ void _pxgl_randomize_pixels(double dt)
 __HIDDEN__ void _pxgl_key_fun(GLFWwindow *win, int key, int scancode, int action, int modifier_bits)
 {
     if (action == GLFW_PRESS || action == GLFW_RELEASE)
-        _pxgl_keystates[key] = action;
+        _pxgl_keystates[key] = (pxgl_keystate_t)action;
 }
 
 __HIDDEN__ void _pxgl_mouse_fun(GLFWwindow *window, int button, int action, int mods)
 {
     if (action == GLFW_PRESS || action == GLFW_RELEASE)
-        _pxgl_keystates[button + GLFW_KEY_LAST] = action;
+        _pxgl_keystates[button + GLFW_KEY_LAST] = (pxgl_keystate_t)action;
 }
 
 __HIDDEN__ void _pxgl_update_keypresses()
