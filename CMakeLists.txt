@@ -1,13 +1,14 @@
 cmake_minimum_required(VERSION 3.0.0)
-project(PixelGLFrontend VERSION 0.1.0)
-#SET(CMAKE_C_COMPILER ${CMAKE_CXX_COMPILER})
+project(PixelGLFrontend CXX)
+set(CMAKE_VERBOSE_MAKEFILE)
+
+#INCLUDE(CMakeForceCompiler)
+#CMAKE_FORCE_C_COMPILER(gcc GNU)
+#CMAKE_FORCE_CXX_COMPILER(g++ GNU)
 
 include_directories(${PROJECT_SOURCE_DIR})
 add_executable(${PROJECT_NAME} main.cpp)
-set_target_properties(${PROJECT_NAME} PROPERTIES C_STANDARD 11)
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fvisibility=hidden")
-#SET_SOURCE_FILES_PROPERTIES( pixelgl.h PROPERTIES LANGUAGE C )
-#SET_SOURCE_FILES_PROPERTIES( pixelgl.h PROPERTIES LINKER_LANGUAGE C )
+#set_target_properties(${PROJECT_NAME} PROPERTIES CMAKE_CXX_STANDARD 14)
 
 find_package(OpenGL REQUIRED)
 target_link_libraries(${PROJECT_NAME} OpenGL::GL)

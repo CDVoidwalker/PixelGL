@@ -1,39 +1,52 @@
 #include "pixelgl.h"
+#include <iostream>
 
-int x = 5, y = 5;
-const pixel_t PLAYER_COLOR = {.r = 255, .g = 0, .b = 0};
+const PixelGL::Pixel PLAYER_COLOR(255, 0, 0);
 
-void update(double dt)
+class Game : public PixelGL::Engine
 {
-    pxgl_clear();
-    if (pxgl_keystate(GLFW_KEY_A) == PXGLKEY_PRESSED)
-        x--;
+    int x = 5, y = 5;
 
-    if (pxgl_keystate(GLFW_KEY_D) == PXGLKEY_RELEASED)
-        x++;
+public:
+    Game(int width, int height, int pixelsize, double fps, int fullscreen) : Engine(width, height, pixelsize, fps, fullscreen) {
 
-    if (pxgl_keystate(GLFW_KEY_W) == PXGLKEY_HELD)
-        y++;
+    };
 
-    if (pxgl_keystate(GLFW_KEY_S) == PXGLKEY_HELD)
-        y--;
+    virtual void Start() override {
+        printf("Chuj :==D");
+    };
 
-    if (pxgl_mbuttonstate(GLFW_MOUSE_BUTTON_1) == PXGLKEY_PRESSED)
-        vlog("Mouse PRESSED");
+    virtual void Update(double dt) override
+    {
+        Clear();
+        if (GetKeyState(GLFW_KEY_A) == PixelGL::KeyState::HELD)
+            x--;
 
-    if (pxgl_mbuttonstate(GLFW_MOUSE_BUTTON_1) == PXGLKEY_HELD)
-        vlog("Mouse HELD");
+        if (GetKeyState(GLFW_KEY_D) == PixelGL::KeyState::HELD)
+            x++;
 
-    if (pxgl_mbuttonstate(GLFW_MOUSE_BUTTON_1) == PXGLKEY_RELEASED)
-        vlog("Mouse RELEASED");
+        if (GetKeyState(GLFW_KEY_W) == PixelGL::KeyState::HELD)
+            y++;
 
-    pxgl_setpixel(x,y, PLAYER_COLOR);
-}
+        if (GetKeyState(GLFW_KEY_S) == PixelGL::KeyState::HELD)
+            y--;
+
+        if (GetMouseButtonState(GLFW_MOUSE_BUTTON_1) == PixelGL::KeyState::PRESSED)
+            std::cout << "Mouse PRESSED" << "\n";
+
+        if (GetMouseButtonState(GLFW_MOUSE_BUTTON_1) == PixelGL::KeyState::HELD)
+            std::cout << "Mouse HELD" << "\n";
+
+        if (GetMouseButtonState(GLFW_MOUSE_BUTTON_1) == PixelGL::KeyState::RELEASED)
+            std::cout << "Mouse RELEASED" << "\n";
+
+        SetPixel(x, y, PLAYER_COLOR);
+    }
+};
 
 int main(int argc, char **argv)
 {
-    pxgl_init(128, 64, 8, 60, GL_FALSE, update); // update
-    pxgl_free();
-
+    Game g = Game(128, 64, 4, 60, false);
+    g.Run();
     return 0;
 }
