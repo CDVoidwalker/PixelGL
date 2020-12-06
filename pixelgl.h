@@ -2,6 +2,8 @@
 #define PIXELGL_H
 
 #include <cstring> // for memset
+#include <string>
+#include <memory>
 #include <stdio.h>
 #include <stdlib.h>
 #include <GL/glew.h>
@@ -82,17 +84,22 @@ namespace PixelGL
             return Vector2(x * scale, y * scale);
         }
 
-        bool operator==(const Vector2<T> &other)
+        bool operator==(const Vector2<T> &other) const
         {
             return x == other.x && y == other.y;
         }
 
-        bool operator!=(const Vector2<T> &other)
+        bool operator!=(const Vector2<T> &other) const
         {
             return !(*this == other);
         }
 
-        T length()
+        // for sorting 
+        bool operator<(const Vector2<T> &other) const {
+            return x < other.x || (x == other.x  && y < other.y);
+        }
+
+        T length() const
         {
             return sqrt(x * x + y * y);
         }
@@ -162,7 +169,7 @@ namespace PixelGL
                                       "}";
 
         int _width, _height, _pixelsize, _fullscreen;
-        char *_title;
+        std::string _title;
         GLFWwindow *_win;
         Pixel *_pixels;
 
@@ -173,7 +180,6 @@ namespace PixelGL
         GLuint _shader_program;
         double _fps = 2;
         long double _s_delay;
-
 
         inline int _pixelindex(int x, int y);
         void _refresh_framebuffer();
@@ -187,7 +193,7 @@ namespace PixelGL
 
     public:
         // TODO: support width and height other than powers of 2
-        Engine(int width, int height, int pixelsize, double fps, int fullscreen);
+        Engine(int width, int height, int pixelsize, double fps, int fullscreen, const std::string& title = "PixelGL Window");
         ~Engine();
         void Run();
 
@@ -195,12 +201,29 @@ namespace PixelGL
         KeyState GetMouseButtonState(int glfw_mousebutton);
 
         Vector2<double> MousePosition();
-        Vector2<unsigned int> MousePixelPosition();
+        Vector2<int> MousePixelPosition();
 
         inline void SetPixel(int x, int y, Pixel col);
         inline void SetPixelUnsafe(int x, int y, Pixel col);
         inline Pixel GetPixel(int x, int y);
         inline Pixel GetPixelUnsafe(int x, int y);
+        inline bool isInBounds(int x, int y);
+
+        template <typename Num>
+        inline void SetPixel(const Vector2<Num> &pos, Pixel col);
+
+        template <typename Num>
+        inline void SetPixelUnsafe(const Vector2<Num> &pos, Pixel col);
+
+        template <typename Num>
+        inline Pixel GetPixel(const Vector2<Num> &pos);
+
+        template <typename Num>
+        inline Pixel GetPixelUnsafe(const Vector2<Num> &pos);
+
+        template <typename Num>
+        inline bool isInBounds(const PixelGL::Vector2<Num> &pos);
+
         void Clear();
     };
 
@@ -230,7 +253,7 @@ namespace PixelGL
         return v;
     }
 
-    Vector2<unsigned int> Engine::MousePixelPosition()
+    Vector2<int> Engine::MousePixelPosition()
     {
         Vector2<double> mpos = MousePosition();
 
@@ -239,8 +262,7 @@ namespace PixelGL
         vclamp(x, 0, _width - 1);
         vclamp(y, 0, _height - 1);
 
-        Vector2<unsigned int> r(x, y);
-        return r;
+        return {x,y};
     }
 
     inline int Engine::_pixelindex(int x, int y)
@@ -248,30 +270,71 @@ namespace PixelGL
         return x + (y * _width);
     }
 
+    inline void Engine::SetPixel(int x, int y, Pixel col)
+    {
+        if (isInBounds(x, y))
+            SetPixelUnsafe(x, y, col);
+        else
+            vthrow("SetPixel called with out of bounds coordinates!");
+    }
+
     void Engine::SetPixelUnsafe(int x, int y, Pixel col)
     {
         _pixels[_pixelindex(x, y)] = col;
     }
 
-    inline void Engine::SetPixel(int x, int y, Pixel col)
-    {
-        if (x >= 0 && x < _width && y >= 0 && y < _height)
-            SetPixelUnsafe(x, y, col);
-    }
-
     inline Pixel Engine::GetPixel(int x, int y)
     {
-        if (x >= 0 && x < _width && y >= 0 && y < _height)
+        if (isInBounds(x, y))
             return GetPixelUnsafe(x, y);
         else
-        {
-            vthrow("getpixel called with out of bounds coordinates!");
-        }
+            vthrow("GetPixel called with out of bounds coordinates!");
     }
 
     inline Pixel Engine::GetPixelUnsafe(int x, int y)
     {
         return _pixels[_pixelindex(x, y)];
+    }
+
+    template <typename Num>
+    inline void Engine::SetPixel(const Vector2<Num> &pos, Pixel col)
+    {
+        if (isInBounds(pos))
+            SetPixelUnsafe(pos, col);
+        else
+            vthrow("SetPixel called with out of bounds coordinates!");
+    }
+
+    template <typename Num>
+    inline void Engine::SetPixelUnsafe(const Vector2<Num> &pos, Pixel col)
+    {
+        _pixels[_pixelindex(pos.x, pos.y)] = col;
+    }
+
+    template <typename Num>
+    inline Pixel Engine::GetPixel(const Vector2<Num> &pos)
+    {
+        if (isInBound(pos))
+            return GetPixelUnsafe(pos);
+        else
+            vthrow("GetPixel called with out of bounds coordinates!");
+    }
+
+    template <typename Num>
+    inline Pixel Engine::GetPixelUnsafe(const Vector2<Num> &pos)
+    {
+        return _pixels[_pixelindex(pos.x, pos.y)];
+    }
+
+    template <typename Num>
+    inline bool Engine::isInBounds(const PixelGL::Vector2<Num> &pos)
+    {
+        return !(pos.x < 0 || pos.x >= _width || pos.y < 0 || pos.y >= _height);
+    }
+
+    inline bool Engine::isInBounds(int x, int y)
+    {
+        return !(x < 0 || x >= _width || y < 0 || y >= _height);
     }
 
     void Engine::_create_framebuffer()
@@ -327,7 +390,7 @@ namespace PixelGL
         }
     }
 
-    Engine::Engine(int width, int height, int pixelsize, double fps, int fullscreen)
+    Engine::Engine(int width, int height, int pixelsize, double fps, int fullscreen, const std::string& title)
     {
         this->_width = width;
         this->_height = height;
@@ -335,7 +398,7 @@ namespace PixelGL
         this->_fullscreen = fullscreen;
         this->_fps = fps;
         this->_s_delay = 1.0 / _fps;
-        this->_title = "PixelGL Window";
+        this->_title = title;
 
         if (!glfwInit())
         {
@@ -349,13 +412,13 @@ namespace PixelGL
         glfwWindowHint(GLFW_RESIZABLE, GL_FALSE); // not resizable
         glfwWindowHint(GLFW_SAMPLES, 1);          // multisampling set to 1
         GLFWmonitor *monitor = _fullscreen ? glfwGetPrimaryMonitor() : NULL;
-        _win = glfwCreateWindow(_width * pixelsize, _height * pixelsize, _title, NULL, NULL); // (TODO: FIX FULLSCREEN) not fullscreen , not sharing resources
+        _win = glfwCreateWindow(_width * pixelsize, _height * pixelsize, _title.c_str(), NULL, NULL); // (TODO: FIX FULLSCREEN) not fullscreen , not sharing resources
         glfwMakeContextCurrent(_win);
         glfwSwapInterval(1);
 
         if (_win != NULL)
         {
-            vlogf("Successfully initalized glfw ver(%s) window with width=%i height=%i title=%s fullscreen=%i", glfwGetVersionString(), _width, _height, _title, _fullscreen);
+            vlogf("Successfully initalized glfw ver(%s) window with width=%i height=%i title=%s fullscreen=%i", glfwGetVersionString(), _width, _height, _title.c_str(), _fullscreen);
         }
         else
         {
