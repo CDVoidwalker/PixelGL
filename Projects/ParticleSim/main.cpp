@@ -210,38 +210,38 @@ public:
         // Clear drawing area
         Clear();
 
-        // Clear out next state
-        // note that all data under pointers is being handled in sim.simulation loops
-        simulation.nextGen.clear();
-
         // Create new state out of current sim.simulation and draw current
-        for (auto item : simulation.currentGen)
+        for (auto cg : simulation.currentGen)
         {
-            if (item.second == nullptr)
+            if (cg.second == nullptr)
                 continue;
 
-            if (item.second->needsUpdate)
+            if (cg.second->needsUpdate)
             {
-                item.second->SimulationStep(item.first, this);
-                SetPixel(item.first, item.second->GetColor());
+                cg.second->SimulationStep(cg.first, this);
+                SetPixel(cg.first, cg.second->GetColor());
             }
         }
 
         // clear sim.simulation
-        for (auto it = simulation.currentGen.begin(); it != simulation.currentGen.end(); it++)
+        for (auto cg : simulation.currentGen)
         {
-            if (it->second != nullptr)
-                delete it->second;
+            if (cg.second != nullptr)
+                delete cg.second;
         }
 
         simulation.currentGen.clear();
 
         // Push next generation into current and clear next generation
-        for (auto it = simulation.nextGen.begin(); it != simulation.nextGen.end(); it++)
+        for (auto ng : simulation.nextGen)
         {
-            if (it->second != nullptr)
-                simulation.currentGen[it->first] = it->second;
+            if (ng.second != nullptr) 
+                simulation.currentGen[ng.first] = ng.second; // there is no memory leak here, we pass pointers to first gen
         }
+
+        // Clear out next state
+        // note that all data under pointers is being handled in sim.simulation loops
+        simulation.nextGen.clear();
     }
 };
 
