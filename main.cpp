@@ -1,11 +1,16 @@
 #include "pixelgl.h"
 #include <iostream>
 
-const PixelGL::Pixel PLAYER_COLOR(255, 0, 0);
+using namespace PixelGL;
 
-class Game : public PixelGL::Engine
+const Pixel RED(255, 0, 0);
+
+class Game : public Engine
 {
-    int x = 5, y = 5;
+    Vector2<int> start;
+    Vector2<int> end;
+    bool draw = false;
+    int mode = 0;
 
 public:
     Game(int width, int height, int pixelsize, double fps, int fullscreen) : Engine(width, height, pixelsize, fps, fullscreen){};
@@ -15,37 +20,49 @@ public:
     virtual void Update(double dt) override
     {
         Clear();
-        if (GetKeyState(GLFW_KEY_A) == PixelGL::KeyState::HELD)
-            x--;
+        if (GetKeyState(GLFW_KEY_1) == PRESSED)
+            mode = 0;
+        if (GetKeyState(GLFW_KEY_2) == PRESSED)
+            mode = 1;
+        if (GetKeyState(GLFW_KEY_3) == PRESSED)
+            mode = 2;
 
-        if (GetKeyState(GLFW_KEY_D) == PixelGL::KeyState::HELD)
-            x++;
+        switch (GetMouseButtonState(GLFW_MOUSE_BUTTON_1))
+        {
+        case PRESSED:
+            start = MousePixelPosition();
+            end = start;
+            draw = true;
+            break;
+        case HELD:
+            end = MousePixelPosition();
+            break;
+        case RELEASED:
+            draw = false;
+            break;
+        }
 
-        if (GetKeyState(GLFW_KEY_W) == PixelGL::KeyState::HELD)
-            y++;
-
-        if (GetKeyState(GLFW_KEY_S) == PixelGL::KeyState::HELD)
-            y--;
-
-        if (GetMouseButtonState(GLFW_MOUSE_BUTTON_1) == PixelGL::KeyState::PRESSED)
-            std::cout << "Mouse PRESSED"
-                      << "\n";
-
-        if (GetMouseButtonState(GLFW_MOUSE_BUTTON_1) == PixelGL::KeyState::HELD)
-            std::cout << "Mouse HELD"
-                      << "\n";
-
-        if (GetMouseButtonState(GLFW_MOUSE_BUTTON_1) == PixelGL::KeyState::RELEASED)
-            std::cout << "Mouse RELEASED"
-                      << "\n";
-
-        SetPixel(x, y, PLAYER_COLOR);
+        if (draw)
+        {
+            switch (mode)
+            {
+            case 0:
+                Line(start, end, RED);
+                break;
+            case 1:
+                Rect(start, end, RED);
+                break;
+            case 2:
+                FillRect(start, end, RED);
+                break;
+            }
+        }
     }
 };
 
 int main(int argc, char **argv)
 {
-    Game g = Game(128, 64, 4, 60, false);
+    Game g = Game(32, 32, 16, 60, false);
     g.Run();
     return 0;
 }

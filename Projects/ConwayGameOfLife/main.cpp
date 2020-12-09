@@ -21,7 +21,7 @@ public:
     std::vector<Change> simulationDelta;
     bool simulate = false;
 
-    int livingNeighbours(Vector2<int> pos) {
+    int livingNeighbours(const Vector2<int>& pos) {
         Vector2<int> offsets[] = { {-1, 1}, {0, 1}, {1, 1}, {-1, 0}, {1, 0}, {-1, -1}, {0, -1}, {1, -1} };
         int livingCells = 0;
         for (auto offset : offsets) {
@@ -29,7 +29,7 @@ public:
             if (!isInBounds(sum))
                 continue;
 
-            if (GetPixel(sum.x, sum.y) == LIVING_CELL)
+            if (GetPixel(sum) == LIVING_CELL)
                 livingCells++;
         }
         
@@ -42,10 +42,10 @@ public:
     {
         if (GetMouseButtonState(GLFW_MOUSE_BUTTON_1) == KeyState::HELD){
             Vector2<int> pos = MousePixelPosition();
-            SetPixel(pos.x, pos.y, LIVING_CELL);
+            SetPixel(pos, LIVING_CELL);
         } else if (GetMouseButtonState(GLFW_MOUSE_BUTTON_2) == KeyState::HELD) {
             Vector2<int> pos = MousePixelPosition();
-            SetPixel(pos.x, pos.y, DEAD_CELL);
+            SetPixel(pos, DEAD_CELL);
         }
 
         if (GetKeyState(GLFW_KEY_SPACE) == KeyState::PRESSED)
@@ -56,7 +56,7 @@ public:
 
         for (int x = 0; x < WIDTH; x++)
         for (int y = 0; y < HEIGHT; y++) {
-            Pixel celltype = GetPixelUnsafe(x,y);
+            Pixel celltype = GetPixelUnsafe({x,y});
             int aliveNeighbours = livingNeighbours({x,y});
 
             if (celltype == DEAD_CELL && aliveNeighbours == 3)
@@ -66,7 +66,7 @@ public:
         }
 
         for (auto change : simulationDelta) {
-            SetPixel(change.pos.x, change.pos.y, change.alive ? LIVING_CELL : DEAD_CELL);
+            SetPixel(change.pos, change.alive ? LIVING_CELL : DEAD_CELL);
         }
 
         simulationDelta.clear();

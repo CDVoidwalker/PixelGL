@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <math.h>
 
 #ifdef __linux__
 #include <unistd.h>
@@ -19,6 +20,7 @@
 namespace PixelGL
 {
 #pragma region Macros
+#ifdef PIXELGL_DEBUG
 #define vlog(x)         \
     do                  \
     {                   \
@@ -34,7 +36,10 @@ namespace PixelGL
         printf("\n");     \
         fflush(stdout);   \
     } while (0)
-
+#else
+#define vlog(x)
+#define vlogf(x, args...)
+#endif
 #define vclamp(val, min, max) \
     do                        \
     {                         \
@@ -94,14 +99,35 @@ namespace PixelGL
             return !(*this == other);
         }
 
-        // for sorting 
-        bool operator<(const Vector2<T> &other) const {
-            return x < other.x || (x == other.x  && y < other.y);
+        // for sorting
+        bool operator<(const Vector2<T> &other) const
+        {
+            return x < other.x || (x == other.x && y < other.y);
         }
 
         T length() const
         {
-            return sqrt(x * x + y * y);
+            return std::sqrt(x * x + y * y);
+        }
+
+        operator Vector2<int>()
+        {
+            return Vector2<int>((int)x, (int)y);
+        }
+
+        operator Vector2<float>()
+        {
+            return Vector2<float>((float)x, (float)y);
+        }
+
+        operator Vector2<double>()
+        {
+            return Vector2<double>((float)x, (float)y);
+        }
+
+        operator Vector2<long>()
+        {
+            return Vector2<long>((long)x, (long)y);
         }
     };
 
@@ -193,9 +219,10 @@ namespace PixelGL
 
     public:
         // TODO: support width and height other than powers of 2
-        Engine(int width, int height, int pixelsize, double fps, int fullscreen, const std::string& title = "PixelGL Window");
+        Engine(int width, int height, int pixelsize, double fps, int fullscreen, const std::string &title = "PixelGL Window");
         ~Engine();
         void Run();
+        void SetTitle(const std::string &title);
 
         KeyState GetKeyState(int glfw_key);
         KeyState GetMouseButtonState(int glfw_mousebutton);
@@ -203,26 +230,17 @@ namespace PixelGL
         Vector2<double> MousePosition();
         Vector2<int> MousePixelPosition();
 
-        inline void SetPixel(int x, int y, Pixel col);
-        inline void SetPixelUnsafe(int x, int y, Pixel col);
-        inline Pixel GetPixel(int x, int y);
-        inline Pixel GetPixelUnsafe(int x, int y);
-        inline bool isInBounds(int x, int y);
+        // Returns true when coordinates are in bounds.
+        inline bool SetPixel(const Vector2<int> &pos, Pixel col);
+        inline void SetPixelUnsafe(const Vector2<int> &pos, Pixel col);
+        inline Pixel GetPixel(const Vector2<int> &pos);
+        inline Pixel GetPixelUnsafe(const Vector2<int> &pos);
+        inline bool isInBounds(const PixelGL::Vector2<int> &pos);
+        void Line(Vector2<int> from, Vector2<int> to, const PixelGL::Pixel &col);
 
-        template <typename Num>
-        inline void SetPixel(const Vector2<Num> &pos, Pixel col);
-
-        template <typename Num>
-        inline void SetPixelUnsafe(const Vector2<Num> &pos, Pixel col);
-
-        template <typename Num>
-        inline Pixel GetPixel(const Vector2<Num> &pos);
-
-        template <typename Num>
-        inline Pixel GetPixelUnsafe(const Vector2<Num> &pos);
-
-        template <typename Num>
-        inline bool isInBounds(const PixelGL::Vector2<Num> &pos);
+        // TODO: it's slow, speed it up by adding fast horizontal line with memcpy
+        void Rect(const Vector2<int> &topLeft, const Vector2<int> &botRight, const PixelGL::Pixel &col);
+        void FillRect(const Vector2<int> &topLeft, const Vector2<int> &botRight, const PixelGL::Pixel &col);
 
         void Clear();
     };
@@ -262,7 +280,7 @@ namespace PixelGL
         vclamp(x, 0, _width - 1);
         vclamp(y, 0, _height - 1);
 
-        return {x,y};
+        return {x, y};
     }
 
     inline int Engine::_pixelindex(int x, int y)
@@ -270,71 +288,68 @@ namespace PixelGL
         return x + (y * _width);
     }
 
-    inline void Engine::SetPixel(int x, int y, Pixel col)
-    {
-        if (isInBounds(x, y))
-            SetPixelUnsafe(x, y, col);
-        else
-            vthrow("SetPixel called with out of bounds coordinates!");
-    }
-
-    void Engine::SetPixelUnsafe(int x, int y, Pixel col)
-    {
-        _pixels[_pixelindex(x, y)] = col;
-    }
-
-    inline Pixel Engine::GetPixel(int x, int y)
-    {
-        if (isInBounds(x, y))
-            return GetPixelUnsafe(x, y);
-        else
-            vthrow("GetPixel called with out of bounds coordinates!");
-    }
-
-    inline Pixel Engine::GetPixelUnsafe(int x, int y)
-    {
-        return _pixels[_pixelindex(x, y)];
-    }
-
-    template <typename Num>
-    inline void Engine::SetPixel(const Vector2<Num> &pos, Pixel col)
+    inline bool Engine::SetPixel(const Vector2<int> &pos, Pixel col)
     {
         if (isInBounds(pos))
+        {
             SetPixelUnsafe(pos, col);
+            return true;
+        }
         else
-            vthrow("SetPixel called with out of bounds coordinates!");
+            vlog("Engine::SetPixel called with out of bounds coordinates!");
+
+        return false;
     }
 
-    template <typename Num>
-    inline void Engine::SetPixelUnsafe(const Vector2<Num> &pos, Pixel col)
+    inline void Engine::SetPixelUnsafe(const Vector2<int> &pos, Pixel col)
     {
         _pixels[_pixelindex(pos.x, pos.y)] = col;
     }
 
-    template <typename Num>
-    inline Pixel Engine::GetPixel(const Vector2<Num> &pos)
+    inline Pixel Engine::GetPixel(const Vector2<int> &pos)
     {
-        if (isInBound(pos))
+        if (isInBounds(pos))
             return GetPixelUnsafe(pos);
         else
-            vthrow("GetPixel called with out of bounds coordinates!");
+            vlog("Engine::GetPixel called with out of bounds coordinates!");
     }
 
-    template <typename Num>
-    inline Pixel Engine::GetPixelUnsafe(const Vector2<Num> &pos)
+    inline Pixel Engine::GetPixelUnsafe(const Vector2<int> &pos)
     {
         return _pixels[_pixelindex(pos.x, pos.y)];
     }
 
-    template <typename Num>
-    inline bool Engine::isInBounds(const PixelGL::Vector2<Num> &pos)
+    void Engine::Line(Vector2<int> from, Vector2<int> to, const PixelGL::Pixel &col)
     {
-        return !(pos.x < 0 || pos.x >= _width || pos.y < 0 || pos.y >= _height);
+        Vector2<float> ab = to - from;
+        float dx = ab.x / ab.length(), dy = ab.y / ab.length();
+        for (int i = 0; i <= std::round(ab.length()); i++)
+        {
+            SetPixel({std::round(from.x + (dx * i)), std::round(from.y + (dy * i))}, col);
+        }
     }
 
-    inline bool Engine::isInBounds(int x, int y)
+    void Engine::Rect(const Vector2<int> &topLeft, const Vector2<int> &botRight, const PixelGL::Pixel &col)
     {
-        return !(x < 0 || x >= _width || y < 0 || y >= _height);
+        Line({topLeft.x, topLeft.y},  {botRight.x, topLeft.y}, col); // TODO: replace with fast horizontal line
+        Line({botRight.x, topLeft.y}, {botRight.x, botRight.y}, col);
+        Line({botRight.x, botRight.y},{topLeft.x, botRight.y}, col); // TODO: replace with fast horizontal line
+        Line({topLeft.x, botRight.y}, {topLeft.x, topLeft.y}, col);
+    }
+
+    void Engine::FillRect(const Vector2<int> &p1, const Vector2<int> &p2, const PixelGL::Pixel &col)
+    {
+        if (p1.y > p2.y)
+            for (int i = p2.y; i <= p1.y; i++)
+                Line({p1.x, i}, {p2.x, i}, col); // TODO: replace with fast horizontal line
+        else
+            for (int i = p1.y; i <= p2.y; i++)
+                Line({p1.x, i}, {p2.x, i}, col); // TODO: replace with fast horizontal line
+    }
+
+    inline bool Engine::isInBounds(const PixelGL::Vector2<int> &pos)
+    {
+        return !(pos.x < 0 || pos.x >= _width || pos.y < 0 || pos.y >= _height);
     }
 
     void Engine::_create_framebuffer()
@@ -390,7 +405,7 @@ namespace PixelGL
         }
     }
 
-    Engine::Engine(int width, int height, int pixelsize, double fps, int fullscreen, const std::string& title)
+    Engine::Engine(int width, int height, int pixelsize, double fps, int fullscreen, const std::string &title)
     {
         this->_width = width;
         this->_height = height;
@@ -540,5 +555,11 @@ namespace PixelGL
 
     void Engine::Update(double dt) {}
     void Engine::Start() {}
+    void Engine::SetTitle(const std::string &title)
+    {
+        _title = title;
+        glfwSetWindowTitle(this->_win, _title.c_str());
+    }
+
 } // namespace PixelGL
 #endif
