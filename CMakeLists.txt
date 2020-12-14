@@ -5,6 +5,9 @@ set(CMAKE_VERBOSE_MAKEFILE)
 set(OpenGL_GL_PREFERENCE "GLVND")
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/modules)
 
+# for debugging
+add_definitions(-DPIXELGL_DEBUG)
+
 include_directories(${PROJECT_SOURCE_DIR})
 
 find_package(OpenGL REQUIRED)
@@ -38,5 +41,5 @@ add_executable(ParticleSim "${PROJECT_SOURCE_DIR}/Projects/ParticleSim/main.cpp"
 add_executable(${PROJECT_NAME} main.cpp)
 
 add_custom_command(TARGET PixelGLFrontend POST_BUILD
-    COMMAND mkdir "./build/assets" && ln -s ../assets/ ./build/assets
+    COMMAND cd ${PROJECT_SOURCE_DIR} && rm -rf "./build/assets" && ln -s ../assets/ ./build/assets
 )
