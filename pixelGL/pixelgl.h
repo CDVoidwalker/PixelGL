@@ -58,7 +58,7 @@ namespace PixelGL
         Vector2<double> mpos = MousePosition();
 
         int x = mpos.x / _pixelsize;
-        int y = ((_height * _pixelsize) - mpos.y) / _pixelsize;
+        int y = mpos.y / _pixelsize;
         vclamp(x, 0, _width - 1);
         vclamp(y, 0, _height - 1);
 
@@ -268,15 +268,7 @@ namespace PixelGL
         _pixels = (Pixel *)calloc(sizeof(Pixel), _pixels_size);
 
         _create_framebuffer();
-
-        // setup projection
-        glDisable(GL_DEPTH_TEST);
-        glMatrixMode(GL_PROJECTION);
-        glLoadIdentity();
-        glOrtho(0, _width, 0, _height, -1, 1); // world size
-        glMatrixMode(GL_MODELVIEW);
-
-        // Adjust viewport to pixel size
+        glOrtho(0.0, 1.0, 1.0, 0.0, -1.0, 1.0); // world size
         glViewport(0, 0, _width * _pixelsize, _height * _pixelsize);
 
         // Input Management
@@ -320,24 +312,23 @@ namespace PixelGL
 
             glBindTexture(GL_TEXTURE_2D, _framebuffer);
             glEnable(GL_TEXTURE_2D);
-
             glBegin(GL_QUADS);
 
             // top left
-            glTexCoord2f(0.0f, 1.0f);
-            glVertex3f(0.0f, _height, 0.0f);
-
-            // top right
-            glTexCoord2f(1.0f, 1.0f);
-            glVertex3f(_width, _height, 0.0f);
-
-            // bot right
-            glTexCoord2f(1.0f, 0.0f);
-            glVertex3f(_width, 0.0f, 0.0f);
-
-            // bot left
             glTexCoord2f(0.0f, 0.0f);
             glVertex3f(0.0f, 0.0f, 0.0f);
+
+            // top right
+            glTexCoord2f(1.0f, 0.0f);
+            glVertex3f(1.0f, 0.0f, 0.0f);
+
+            // bot right
+            glTexCoord2f(1.0f, 1.0f);
+            glVertex3f(1.0f, 1.0f, 0.0f);
+
+            // bot left
+            glTexCoord2f(0.0f, 1.0f);
+            glVertex3f(0.0f, 1.0f, 0.0f);
             glEnd();
 
             glDisable(GL_TEXTURE_2D);
