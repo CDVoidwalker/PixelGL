@@ -10,30 +10,15 @@
 #include <GLFW/glfw3.h>
 #include <math.h>
 
-#ifdef __linux__
-#include <unistd.h>
-#endif
-#ifdef _WIN32
-#include <windows.h>
-#endif
-
 #include "engine.h"
 #include "image.h"
 #include "macros.h"
 #include "vector2.h"
 #include "pixel.h"
+#include "functions.h"
 
 namespace PixelGL
 {
-    void PXSleep(long long sleepMs)
-    {
-#ifdef __linux__
-        usleep(sleepMs * 1000); // usleep takes sleep time in us (1 millionth of a second)
-#endif
-#ifdef _WIN32
-        Sleep(sleepMs);
-#endif
-    }
     // note: action has corresponding values to keystate
     void _key_fun(GLFWwindow *win, int key, int scancode, int action, int modifier_bits);
     // note: action has corresponding values to keystate
@@ -116,8 +101,43 @@ namespace PixelGL
         return _pixels[_pixelindex(pos.x, pos.y)];
     }
 
+    void Engine::FastHorizontalLine(Vector2<int> from, Vector2<int> to, const PixelGL::Pixel &col)
+    {
+        int start = std::min(from.x, to.x), end = std::max(from.x, to.x);
+#ifdef PIXELGL_DEBUG
+        if (from.y != to.y)
+            vthrow("Engine::FastHorizontalLines Y coordinates are not equal!");
+#endif
+        // assumptions:
+        // end > start
+
+        // if end is lower than 0, means that start also is and they are both out of bounds
+        if (end < 0)
+            return;
+
+        // if start is higher than width, means that end also is
+        if (start >= _width)
+            return;
+
+        // ensure bounds
+        if (end >= _width)
+            end = _width - 1;
+
+        if (start < 0)
+            start = 0;
+
+        size_t pixnum = end - start;
+        memsetPixel(&_pixels[_pixelindex(start, from.y)], pixnum + 1, col);
+    }
+
     void Engine::Line(Vector2<int> from, Vector2<int> to, const PixelGL::Pixel &col)
     {
+        if (from == to)
+        {
+            SetPixel(from, col);
+            return;
+        }
+
         Vector2<float> ab = to - from;
         float dx = ab.x / ab.length(), dy = ab.y / ab.length();
         for (int i = 0; i <= std::round(ab.length()); i++)
@@ -128,20 +148,17 @@ namespace PixelGL
 
     void Engine::Rect(const Vector2<int> &topLeft, const Vector2<int> &botRight, const PixelGL::Pixel &col)
     {
-        Line({topLeft.x, topLeft.y}, {botRight.x, topLeft.y}, col); // TODO: replace with fast horizontal line
+        FastHorizontalLine({topLeft.x, topLeft.y}, {botRight.x, topLeft.y}, col);
         Line({botRight.x, topLeft.y}, {botRight.x, botRight.y}, col);
-        Line({botRight.x, botRight.y}, {topLeft.x, botRight.y}, col); // TODO: replace with fast horizontal line
+        FastHorizontalLine({botRight.x, botRight.y}, {topLeft.x, botRight.y}, col);
         Line({topLeft.x, botRight.y}, {topLeft.x, topLeft.y}, col);
     }
 
     void Engine::FillRect(const Vector2<int> &p1, const Vector2<int> &p2, const PixelGL::Pixel &col)
     {
-        if (p1.y > p2.y)
-            for (int i = p2.y; i <= p1.y; i++)
-                Line({p1.x, i}, {p2.x, i}, col); // TODO: replace with fast horizontal line
-        else
-            for (int i = p1.y; i <= p2.y; i++)
-                Line({p1.x, i}, {p2.x, i}, col); // TODO: replace with fast horizontal line
+        int start = std::min(p1.y, p2.y), end = std::max(p1.y, p2.y);
+        for (; start <= end; start++)
+            FastHorizontalLine({p1.x, start}, {p2.x, start}, col);
     }
 
     inline bool Engine::isInBounds(const PixelGL::Vector2<int> &pos)

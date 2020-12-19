@@ -14,7 +14,7 @@ namespace PixelGL
         PRESSED = GLFW_PRESS,
         HELD,
     };
-    
+
     class Engine
     {
         static bool INPUT_MANAGED;
@@ -74,9 +74,11 @@ namespace PixelGL
         inline Pixel GetPixel(const Vector2<int> &pos);
         inline Pixel GetPixelUnsafe(const Vector2<int> &pos);
         inline bool isInBounds(const PixelGL::Vector2<int> &pos);
-        void Line(Vector2<int> from, Vector2<int> to, const PixelGL::Pixel &col);
 
-        // TODO: it's slow, speed it up by adding fast horizontal line with memcpy
+        void FastHorizontalLine(Vector2<int> from, Vector2<int> to, const PixelGL::Pixel& col);
+
+        // fixup that function so it draws properly with width of one
+        void Line(Vector2<int> from, Vector2<int> to, const PixelGL::Pixel &col);
         void Rect(const Vector2<int> &topLeft, const Vector2<int> &botRight, const PixelGL::Pixel &col);
         void FillRect(const Vector2<int> &topLeft, const Vector2<int> &botRight, const PixelGL::Pixel &col);
 

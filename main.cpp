@@ -7,8 +7,7 @@ const Pixel RED(255, 0, 0);
 
 class Game : public Engine
 {
-    Vector2<int> start;
-    Vector2<int> end;
+    Vector2<int> start, end;
     bool draw = false;
     int mode = 0;
 
