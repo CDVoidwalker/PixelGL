@@ -17,15 +17,19 @@ public:
 
     virtual void Start() override{
         Image i("./assets/testmap.png");
-        Vector2<unsigned int> dim = i.getDimensions();
+        Vector2<int> dim = i.getDimensions();
         vlogf("Image dimensions are [%i,%i]", dim.x, dim.y);
-        Pixel px = i.getBuffer()[0];
-        vlogf("Pixel at [0,0] is [%i, %i, %i]", px.r, px.g, px.b);
+
+        for (int ix = 0; ix < i.getDimensions().x; ix++) {
+            for (int iy = 0; iy < i.getDimensions().y; iy++) {
+                SetPixel({ix, iy}, i.getPixel({ix, iy}));
+            }
+        }
     };
 
     virtual void Update(double dt) override
     {
-        Clear();
+        //Clear();
         if (GetKeyState(GLFW_KEY_1) == PRESSED)
             mode = 0;
         if (GetKeyState(GLFW_KEY_2) == PRESSED)
