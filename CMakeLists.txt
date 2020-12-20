@@ -8,7 +8,7 @@ set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/modules)
 # for debugging
 add_definitions(-DPIXELGL_DEBUG)
 
-include_directories(${PROJECT_SOURCE_DIR})
+include_directories("${PROJECT_SOURCE_DIR}/pixelGL")
 
 find_package(OpenGL REQUIRED)
 link_libraries(OpenGL::GL)
@@ -33,6 +33,7 @@ link_libraries(PNG::PNG)
 include_directories(${PNG_INCLUDE_DIRS})
 
 # Header only, nothing to link
+# TODO: make png optional, as well as pixelGL image module
 find_package(png++ REQUIRED)
 include_directories(${png++_INCLUDE_DIR})
 
