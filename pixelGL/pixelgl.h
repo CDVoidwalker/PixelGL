@@ -119,6 +119,10 @@ namespace PixelGL
         if (start >= _width)
             return;
 
+        // assuming that both are equal, only one check suffices
+        if (from.y >= _height || from.y < 0)
+            return;
+
         // ensure bounds
         if (end >= _width)
             end = _width - 1;
@@ -128,6 +132,41 @@ namespace PixelGL
 
         size_t pixnum = end - start;
         memsetPixel(&_pixels[_pixelindex(start, from.y)], pixnum + 1, col);
+    }
+
+    void Engine::CopyImageLine(Vector2<int> origin, size_t pixnum, PixelGL::Pixel *source)
+    {
+        int end = pixnum + origin.x;
+        bool negativex = false;
+
+        // oob on Y axis
+        if (origin.y >= _height || origin.y < 0)
+            return;
+
+        // oob on positive x
+        if (origin.x > _width)
+            return;
+
+        // oob on negative x
+        if (end < 0)
+        {
+            return;
+            // only start point is oob on positive x
+        }
+        else if (origin.x < 0)
+        {
+            pixnum -= std::abs(origin.x);
+            source += -origin.x;
+            origin.x = 0;
+        }
+
+        // only end point is oob on positive x
+        if (end >= _width) {
+            pixnum -= end - _width;
+            end = _width - 1;
+        }
+        
+        memcpyPixel(source, pixnum, &_pixels[_pixelindex(origin.x, origin.y)]);
     }
 
     void Engine::Line(Vector2<int> from, Vector2<int> to, const PixelGL::Pixel &col)

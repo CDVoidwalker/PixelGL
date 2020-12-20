@@ -21,12 +21,14 @@ namespace PixelGL
 #endif
     }
 
+    // Copies number pixels from source to destination.
     void memcpyPixel(Pixel *source, const size_t number, Pixel *destination)
     {
         for (size_t i = 0; i < number; i++)
             destination[i] = source[i];
     }
 
+    // Sets number of pixels from start to constant color
     void memsetPixel(Pixel *start, const size_t number, Pixel constant)
     {
         for (size_t i = 0; i < number; i++)

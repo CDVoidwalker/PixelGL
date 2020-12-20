@@ -75,6 +75,7 @@ namespace PixelGL
         inline Pixel GetPixelUnsafe(const Vector2<int> &pos);
         inline bool isInBounds(const PixelGL::Vector2<int> &pos);
 
+        void CopyImageLine(Vector2<int> origin, size_t pixnum, PixelGL::Pixel *source);
         void FastHorizontalLine(Vector2<int> from, Vector2<int> to, const PixelGL::Pixel& col);
 
         // fixup that function so it draws properly with width of one
