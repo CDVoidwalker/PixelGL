@@ -25,6 +25,14 @@ namespace PixelGL
         // Empty constructor for uninitalized image
         Image() {}
 
+        // Copy constructor
+        Image(Image const& rhs)
+        {
+            dimensions = rhs.dimensions;
+            pixelBuffer = new Pixel[dimensions.x * dimensions.y];
+            std::copy(rhs.pixelBuffer, rhs.pixelBuffer + (dimensions.x * dimensions.y), pixelBuffer);
+        }
+
         // Constructor for creating images manually
         Image(const Vector2<int> &dimensions)
         {
@@ -90,6 +98,23 @@ namespace PixelGL
         {
             for (int iy = 0; iy < dimensions.y; iy++)
                 engine->CopyImageLine({coordinates.x, coordinates.y + iy}, dimensions.x, pixelBuffer + (iy * dimensions.x));
+        }
+
+        void Swap(Image& rhs) {
+            Pixel* pxbuf = rhs.pixelBuffer;
+            Vector2<int> dim = rhs.dimensions;
+
+            rhs.dimensions = this->dimensions;
+            rhs.pixelBuffer = this->pixelBuffer;
+
+            this->pixelBuffer = pxbuf;
+            this->dimensions = dim;
+        }
+
+        Image& operator=(Image const& other) {
+            Image copy(other);
+            Swap(copy);
+            return *this;
         }
     };
 } // namespace PixelGL

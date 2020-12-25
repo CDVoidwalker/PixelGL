@@ -12,22 +12,22 @@ class Game : public Engine
     int mode = 0;
 
 public:
-    Image* i;
+    Image i;
     Game(int width, int height, int pixelsize, double fps, int fullscreen) : Engine(width, height, pixelsize, fps, fullscreen){};
 
     virtual void Start() override{
         // Notice that without pointer this would not work
         // becasue i would go out of scope and have garbage
         // data at update.
-        i = new Image("./assets/testmap.png", {0,0}, {32,32});
-        Vector2<int> dim = i->getDimensions();
+        i = Image("./assets/testmap.png", {0,0}, {32,32});
+        Vector2<int> dim = i.getDimensions();
         vlogf("Image dimensions are [%i,%i]", dim.x, dim.y);
     };
 
     virtual void Update(double dt) override
     {
         Clear();
-        i->Draw(bgpos, this);
+        i.Draw(bgpos, this);
         if (GetKeyState(GLFW_KEY_1) == PRESSED)
             mode = 0;
         if (GetKeyState(GLFW_KEY_2) == PRESSED)
