@@ -161,11 +161,12 @@ namespace PixelGL
         }
 
         // only end point is oob on positive x
-        if (end >= _width) {
+        if (end >= _width)
+        {
             pixnum -= end - _width;
             end = _width - 1;
         }
-        
+
         memcpyPixel(source, pixnum, &_pixels[_pixelindex(origin.x, origin.y)]);
     }
 
@@ -389,6 +390,7 @@ namespace PixelGL
             {
                 PXSleep((_s_delay - diff) * 1e3);
             }
+            tickCounter++;
         }
     }
 
@@ -403,6 +405,11 @@ namespace PixelGL
     {
         _title = title;
         glfwSetWindowTitle(this->_win, _title.c_str());
+    }
+
+    uint64_t Engine::GetFrameCount()
+    {
+        return tickCounter;
     }
 
 } // namespace PixelGL

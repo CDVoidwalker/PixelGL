@@ -44,6 +44,7 @@ namespace PixelGL
         GLuint _shader_program;
         double _fps = 2;
         long double _s_delay;
+        uint64_t tickCounter = 0;
 
         inline int _pixelindex(int x, int y);
         void _refresh_framebuffer();
@@ -84,6 +85,8 @@ namespace PixelGL
         void FillRect(const Vector2<int> &topLeft, const Vector2<int> &botRight, const PixelGL::Pixel &col);
 
         void Clear();
+
+        uint64_t GetFrameCount();
     };
 } // namespace PixelGL
 #endif
