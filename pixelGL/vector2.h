@@ -35,6 +35,20 @@ namespace PixelGL
             return Vector2(x * scale, y * scale);
         }
 
+        Vector2<T> &operator+=(const Vector2<T> &other)
+        {
+            this->x += other.x;
+            this->y += other.y;
+            return *this;
+        }
+
+        Vector2<T> &operator-=(const Vector2<T> &other)
+        {
+            this->x -= other.x;
+            this->y -= other.y;
+            return *this;
+        }
+
         bool operator==(const Vector2<T> &other) const
         {
             return x == other.x && y == other.y;
