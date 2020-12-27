@@ -62,7 +62,7 @@ namespace PixelGL
         Image(const std::string &path, Vector2<int> origin, Vector2<int> dim)
         {
             png::image<png::rgb_pixel> img = png::image<png::rgb_pixel>(path);
-            Vector2<int> originalDim{img.get_width(), img.get_height()};
+            Vector2<unsigned int> originalDim{img.get_width(), img.get_height()};
 
             dimensions.x = dim.x;
             dimensions.y = dim.y;
