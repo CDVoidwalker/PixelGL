@@ -10,13 +10,13 @@
 #include <GLFW/glfw3.h>
 #include <math.h>
 
-#include "engine.h"
-#include "image.h"
-#include "macros.h"
-#include "vector2.h"
 #include "pixel.h"
 #include "functions.h"
+#include "vector2.h"
+#include "macros.h"
+#include "engine.h"
 #include "physics.h"
+#include "image.h"
 
 namespace PixelGL
 {
@@ -382,7 +382,7 @@ namespace PixelGL
             glfwPollEvents();
 
             // update and draw
-            Update(diff);
+            Update(diff < _s_delay ? _s_delay : diff);
             _update_keypresses();
             _refresh_framebuffer();
 
