@@ -80,20 +80,20 @@ Vector2<float> GameManager::getPos()
     return pos;
 }
 
-void GameManager::EntityLoop()
+void GameManager::EntityLoop(float dt)
 {
     for (IEntity *e : entities)
     {
         IUpdatable *updatable = dynamic_cast<IUpdatable *>(e);
         if (updatable)
-            updatable->Update();
+            updatable->Update(dt);
     }
 }
 
-void GameManager::Loop()
+void GameManager::Loop(float dt)
 {
     MapRender();
-    EntityLoop();
+    EntityLoop(dt);
     FrameEndTaskLoop();
 }
 

@@ -22,7 +22,7 @@ class GameManager : public IPositionable
     ITileDrawable** tiles;
     std::vector<IEntity*> entities;
     std::vector<std::function<void()>> frameEndTasks;
-    void EntityLoop();
+    void EntityLoop(float dt);
     void MapRender();
     void FrameEndTaskLoop();
 
@@ -30,7 +30,7 @@ public:
     Engine* eng = nullptr;
     static GameManager* getInstance();
     void Init(Engine *eng, const Vector2<float>& pos = {0,BLOCK_DIM});
-    void Loop();
+    void Loop(float dt);
     void AddFrameEndTask(std::function<void()> task);
     void AddEntity(IEntity* entity);
 

@@ -1,6 +1,9 @@
 #ifndef TILEDEFS_H
 #define TILEDEFS_H
 #include "Interfaces.h"
+#include "AssetManager.h"
+#include "engine.h"
+#include "vector2.h"
 
 using namespace PixelGL;
 

@@ -1,7 +1,4 @@
 #include "TileDefs.h"
-#include "AssetManager.h"
-#include "engine.h"
-#include "vector2.h"
 
 void Ground::Draw(const Vector2<float> &pos, MapData mData, Engine *eng)
 {

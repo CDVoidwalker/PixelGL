@@ -8,26 +8,40 @@ Player::Player(const Vector2<float> &pos)
 
 void Player::Jump()
 {
-    velocity.y -= 9;
+    float force = -JUMPFORCE - (abs(velocity.x) / MAX_RUN_SPEED) * JUMPFORCE_ADD;
+    force = std::max(-JUMPFORCE - JUMPFORCE_ADD, force);
+    velocity.y = force;
     inAir = true;
 }
 
-void Player::Move(bool left, bool running)
+void Player::Move(bool left, bool running, float dt)
 {
-    int speed = 1;
-    speed = left ? -speed : speed;
-    int max = running ? MAX_SPEED : MAX_SPEED / 2;
+    float a = running ? RUN_ACCEL : WALK_ACCEL;
+    float max = running ? MAX_RUN_SPEED : MAX_WALK_SPEED;
 
-    velocity.x += speed;
-    vclamp(velocity.x, -max, max);
+    if (left)
+        a = -a;
+
+    bool dirMatch = std::signbit(velocity.x) == std::signbit(a);
+
+    // if velocity and acceleration dir do not match
+    if (!dirMatch)
+    {
+        a *= AIRSLIDE_FACTOR;
+        a *= inAir ? FRICTION_AIR : FRICTION_GROUND;
+    }
+
+    velocity.x = Clamp(velocity.x + a * dt, -max, max);
 }
 
-AABB Player::GetAABB() {
-    return AABB {pos, {BLOCK_DIM / 2.0f, BLOCK_DIM / 2.0f}};
+AABB Player::GetAABB()
+{
+    return AABB{pos, {BLOCK_DIM / 2.0f, BLOCK_DIM / 2.0f}};
 }
 
-void Player::Update()
+void Player::Update(float dt)
 {
+    std::cout << dt << "\n";
     GameManager *gm = GameManager::getInstance();
     std::vector<Vector2<int>> collisions;
 
@@ -37,14 +51,20 @@ void Player::Update()
     bool rightHeld = gm->eng->GetKeyState(GLFW_KEY_RIGHT) == HELD;
 
     if (leftHeld)
-        Move(true, running);
+        Move(true, running, dt);
     else if (rightHeld)
-        Move(false, running);
+        Move(false, running, dt);
     else if (velocity.x != 0)
-        velocity.x = velocity.x > 0 ? velocity.x - 1 : velocity.x + 1;
-// 
+    {
+        float friction = inAir ? FRICTION_AIR : FRICTION_GROUND;
+        velocity.x -= std::copysignf(1.0f, velocity.x) * friction * dt;
+
+        if (abs(velocity.x) <= MIN_SPEED)
+            velocity.x = 0;
+    }
+    //
     if (inAir)
-        velocity.y = jumpHeld ? velocity.y + 1 : velocity.y + 2;
+        velocity.y += jumpHeld ? JUMP_GRAV * dt : GRAV * dt;
     else if (jumpHeld)
         Jump();
 
@@ -58,17 +78,19 @@ void Player::Update()
 
     // X axis collision resolution
     pos.x += velocity.x;
-    
-    for (int tx = tleft; tx <= tright; tx++) {
-        for (int ty = ttop; ty <= tbot; ty++) {
-            AABB aabb, playerAABB = GetAABB();//AABB(resolvedPos, Vector2<float>(BLOCK_DIM/2.0f, BLOCK_DIM/2.0f));
+
+    for (int tx = tleft; tx <= tright; tx++)
+    {
+        for (int ty = ttop; ty <= tbot; ty++)
+        {
+            AABB aabb, playerAABB = GetAABB(); //AABB(resolvedPos, Vector2<float>(BLOCK_DIM/2.0f, BLOCK_DIM/2.0f));
             HitInfo hinfo;
             if (!gm->TryGetTileAABB({tx, ty}, &aabb))
                 continue;
- 
+
             if (!aabb.Intersect(playerAABB, hinfo))
                 continue;
-                
+
             pos.x += hinfo.delta.x;
         }
     }
@@ -76,16 +98,18 @@ void Player::Update()
     // Y axis collision resolution
     pos.y += velocity.y;
 
-    for (int tx = tleft; tx <= tright; tx++) {
-        for (int ty = ttop; ty <= tbot; ty++) {
+    for (int tx = tleft; tx <= tright; tx++)
+    {
+        for (int ty = ttop; ty <= tbot; ty++)
+        {
             AABB aabb, playerAABB = GetAABB();
             HitInfo hinfo;
             if (!gm->TryGetTileAABB({tx, ty}, &aabb))
                 continue;
- 
+
             if (!aabb.Intersect(playerAABB, hinfo))
                 continue;
- 
+
             pos.y += hinfo.delta.y;
             if (hinfo.delta.y < 0)
                 inAir = false;

@@ -18,7 +18,7 @@ public:
 
     virtual void Update(double dt) override
     {
-        GameManager::getInstance()->Loop();
+        GameManager::getInstance()->Loop(dt);
     }
 };
 
