@@ -70,22 +70,34 @@ namespace PixelGL
             return std::sqrt(x * x + y * y);
         }
 
-        operator Vector2<int>()
+        void normalize() {
+            T lenreverse = 1.0 / length();
+            this->x *= lenreverse;
+            this->y *= lenreverse;
+        }
+
+        void rotate(float rad) {
+            float s = sin(rad), c = cos(rad);
+            this->x = x * c - y * s;
+            this->y = x * s + y * c;
+        }
+
+        operator Vector2<int>() const
         {
             return Vector2<int>((int)x, (int)y);
         }
 
-        operator Vector2<float>()
+        operator Vector2<float>() const
         {
             return Vector2<float>((float)x, (float)y);
         }
 
-        operator Vector2<double>()
+        operator Vector2<double>() const
         {
             return Vector2<double>((float)x, (float)y);
         }
 
-        operator Vector2<long>()
+        operator Vector2<long>() const
         {
             return Vector2<long>((long)x, (long)y);
         }
