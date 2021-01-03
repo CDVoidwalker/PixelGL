@@ -16,6 +16,7 @@
 #include "vector2.h"
 #include "pixel.h"
 #include "functions.h"
+#include "physics.h"
 
 namespace PixelGL
 {
