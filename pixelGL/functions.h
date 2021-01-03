@@ -34,5 +34,11 @@ namespace PixelGL
         for (size_t i = 0; i < number; i++)
             start[i] = constant;
     }
+
+    template <typename T>
+    T Clamp(T value, T low, T high)
+    {
+        return (value < low) ? low : ((value > high) ? high : value);
+    }
 } // namespace PixelGL
 #endif
