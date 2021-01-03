@@ -94,10 +94,11 @@ namespace PixelGL
             return pixelBuffer[pos.x + (pos.y * dimensions.x)];
         }
 
-        void Draw(Vector2<int> coordinates, Engine *engine)
+        template <typename T>
+        void Draw(Vector2<T> coordinates, Engine *engine)
         {
             for (int iy = 0; iy < dimensions.y; iy++)
-                engine->CopyImageLine({coordinates.x, coordinates.y + iy}, dimensions.x, pixelBuffer + (iy * dimensions.x));
+                engine->CopyImageLine(Vector2<int>(coordinates.x, coordinates.y + iy), dimensions.x, pixelBuffer + (iy * dimensions.x));
         }
 
         void Swap(Image& rhs) {
