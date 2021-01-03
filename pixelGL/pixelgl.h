@@ -170,7 +170,8 @@ namespace PixelGL
         memcpyPixel(source, pixnum, &_pixels[_pixelindex(origin.x, origin.y)]);
     }
 
-    void Engine::Line(Vector2<int> from, Vector2<int> to, const PixelGL::Pixel &col)
+    template <typename T>
+    void Engine::Line(Vector2<T> from, Vector2<T> to, const PixelGL::Pixel &col)
     {
         if (from == to)
         {
@@ -182,16 +183,16 @@ namespace PixelGL
         float dx = ab.x / ab.length(), dy = ab.y / ab.length();
         for (int i = 0; i <= std::round(ab.length()); i++)
         {
-            SetPixel({std::round(from.x + (dx * i)), std::round(from.y + (dy * i))}, col);
+            SetPixel(Vector2<int>(std::round(from.x + (dx * i)), std::round(from.y + (dy * i))), col);
         }
     }
 
     void Engine::Rect(const Vector2<int> &topLeft, const Vector2<int> &botRight, const PixelGL::Pixel &col)
     {
         FastHorizontalLine({topLeft.x, topLeft.y}, {botRight.x, topLeft.y}, col);
-        Line({botRight.x, topLeft.y}, {botRight.x, botRight.y}, col);
+        Line(Vector2<int>{botRight.x, topLeft.y}, {botRight.x, botRight.y}, col);
         FastHorizontalLine({botRight.x, botRight.y}, {topLeft.x, botRight.y}, col);
-        Line({topLeft.x, botRight.y}, {topLeft.x, topLeft.y}, col);
+        Line(Vector2<int>{topLeft.x, botRight.y}, {topLeft.x, topLeft.y}, col);
     }
 
     void Engine::FillRect(const Vector2<int> &p1, const Vector2<int> &p2, const PixelGL::Pixel &col)
@@ -386,6 +387,7 @@ namespace PixelGL
 
             post = glfwGetTime();
             diff = post - pre;
+            elapsedTime += diff;
             if (diff < _s_delay)
             {
                 PXSleep((_s_delay - diff) * 1e3);
@@ -410,6 +412,10 @@ namespace PixelGL
     uint64_t Engine::GetFrameCount()
     {
         return tickCounter;
+    }
+
+    double Engine::GetElapsedTime() {
+        return elapsedTime;
     }
 
 } // namespace PixelGL

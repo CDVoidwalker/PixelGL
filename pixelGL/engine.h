@@ -45,6 +45,7 @@ namespace PixelGL
         double _fps = 2;
         long double _s_delay;
         uint64_t tickCounter = 0;
+        double elapsedTime = 0;
 
         inline int _pixelindex(int x, int y);
         void _refresh_framebuffer();
@@ -80,13 +81,15 @@ namespace PixelGL
         void FastHorizontalLine(Vector2<int> from, Vector2<int> to, const PixelGL::Pixel& col);
 
         // fixup that function so it draws properly with width of one
-        void Line(Vector2<int> from, Vector2<int> to, const PixelGL::Pixel &col);
+        template <typename T>
+        void Line(Vector2<T> from, Vector2<T> to, const PixelGL::Pixel &col);
         void Rect(const Vector2<int> &topLeft, const Vector2<int> &botRight, const PixelGL::Pixel &col);
         void FillRect(const Vector2<int> &topLeft, const Vector2<int> &botRight, const PixelGL::Pixel &col);
 
         void Clear();
 
         uint64_t GetFrameCount();
+        double GetElapsedTime();
     };
 } // namespace PixelGL
 #endif
