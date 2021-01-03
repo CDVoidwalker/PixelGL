@@ -1,8 +1,19 @@
 #include "GameManager.h"
 using namespace PixelGL;
 
-GameManager::GameManager(const Vector2<int>& pos)
+GameManager *GameManager::_instance = nullptr;
+
+GameManager *GameManager::getInstance()
 {
+    if (!_instance)
+        _instance = new GameManager();
+
+    return _instance;
+}
+
+void GameManager::Init(Engine *eng, const Vector2<float> &pos)
+{
+    this->eng = eng;
     this->pos = pos;
     Image map = Image("./assets/platformer/1-1.png");
     dim = map.getDimensions();
@@ -31,14 +42,14 @@ GameManager::GameManager(const Vector2<int>& pos)
         }
 }
 
-void GameManager::Render(Engine *eng)
+void GameManager::MapRender()
 {
     eng->FillRect({0, 0}, {WIDTH, HEIGHT}, SKY_COLOR);
     MapData mData;
     mData.dim = dim;
     mData.pos = pos;
     mData.tiles = tiles;
-    Vector2<int> tilePos{pos.x / BLOCK_DIM, pos.y / BLOCK_DIM};
+    Vector2<float> tilePos{pos.x / BLOCK_DIM, pos.y / BLOCK_DIM};
     for (int x = tilePos.x; x <= tilePos.x + (WIDTH / BLOCK_DIM); x++)
     {
         for (int y = tilePos.y; y <= tilePos.y + (HEIGHT / BLOCK_DIM); y++)
@@ -53,17 +64,74 @@ void GameManager::Render(Engine *eng)
             if (drawable == nullptr)
                 continue;
 
-            mData.pos = {x,y};
-            drawable->Draw({(x * BLOCK_DIM) - pos.x, (y * BLOCK_DIM) - pos.y},mData, eng);
+            mData.pos = Vector2<float>(x, y);
+            drawable->Draw(WorldToCameraPos(Vector2<float>((x * BLOCK_DIM), (y * BLOCK_DIM))), mData, eng);
         }
     }
 }
 
-void GameManager::Move(Vector2<int> pixels)
+void GameManager::SetPos(const Vector2<float> &pos)
 {
-    pos += pixels;
+    this->pos = pos;
 }
 
-Vector2<int> GameManager::getPos() {
+Vector2<float> GameManager::getPos()
+{
     return pos;
+}
+
+void GameManager::EntityLoop()
+{
+    for (IEntity *e : entities)
+    {
+        IUpdatable *updatable = dynamic_cast<IUpdatable *>(e);
+        if (updatable)
+            updatable->Update();
+    }
+}
+
+void GameManager::Loop()
+{
+    MapRender();
+    EntityLoop();
+    FrameEndTaskLoop();
+}
+
+void GameManager::FrameEndTaskLoop()
+{
+    for (auto task : frameEndTasks)
+        task();
+
+    frameEndTasks.clear();
+}
+
+void GameManager::AddFrameEndTask(std::function<void()> task)
+{
+    frameEndTasks.push_back(task);
+}
+
+void GameManager::AddEntity(IEntity *entity)
+{
+    AddFrameEndTask([this, entity]() { this->entities.push_back(entity); });
+}
+
+Vector2<float> GameManager::WorldToCameraPos(const Vector2<float> &_pos)
+{
+    return {_pos.x - pos.x, _pos.y - pos.y};
+}
+
+bool GameManager::TryGetTileAABB(const Vector2<int>& tilePos, AABB* aabb)
+{
+    if (tilePos.x < 0 || tilePos.x >= dim.x || tilePos.y < 0 || tilePos.y >= dim.y)
+        return false;
+        
+    ITilemapCollidable* col = dynamic_cast<ITilemapCollidable*>(tiles[tilePos.x + (tilePos.y * dim.x)]);
+    if (col) {
+        // if (!simulated)
+        //     col->OnCollisionEnter(pos);
+        *aabb = AABB({tilePos.x * 16.0f, tilePos.y * 16.0f}, {BLOCK_DIM / 2.0f, BLOCK_DIM / 2.0f});
+        return true;
+    }
+
+    return false;
 }

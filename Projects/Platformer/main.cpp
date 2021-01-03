@@ -1,29 +1,24 @@
-#include "CompileDefines.h"
-#include "MapManager.h"
 #include "pixelgl.h"
+#include "CompileDefines.h"
+#include "GameManager.h"
+#include "Player.h"
 #include <iostream>
 
 using namespace PixelGL;
 
 class Game : public Engine
 {
-    MapManager mm;
 public:
     Game(int width, int height, int pixelsize, double fps, int fullscreen) : Engine(width, height, pixelsize, fps, fullscreen){};
 
-    virtual void Start() override{};
+    virtual void Start() override{
+        GameManager::getInstance()->Init(this);
+        GameManager::getInstance()->AddEntity(new Player({BLOCK_DIM * 4,BLOCK_DIM * 13 + 8}));
+    };
 
     virtual void Update(double dt) override
     {
-        if (GetKeyState(GLFW_KEY_LEFT) == HELD)
-            mm.Move({-3,0});
-        if (GetKeyState(GLFW_KEY_RIGHT) == HELD)
-            mm.Move({3,0});
-        if (GetKeyState(GLFW_KEY_UP) == HELD)
-            mm.Move({0,-3});
-        if (GetKeyState(GLFW_KEY_DOWN) == HELD)
-            mm.Move({0,3});
-        mm.Render(this);
+        GameManager::getInstance()->Loop();
     }
 };
 

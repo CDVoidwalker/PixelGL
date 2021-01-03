@@ -15,39 +15,39 @@ namespace TileColors
     const Pixel SKY(255, 255, 255);
 } // namespace TileColors
 
-class Ground : public ITileDrawable
+class Ground : public ITileDrawable, public ITilemapCollidable
 {
 public:
-    virtual void Draw(const Vector2<int> &pos, MapData mData, Engine *eng) override;
+    virtual void Draw(const Vector2<float> &pos, MapData mData, Engine *eng) override;
 };
 
-class Brick : public ITileDrawable
+class Brick : public ITileDrawable, public ITilemapCollidable // todo bump
 {
 public:
-    virtual void Draw(const Vector2<int> &pos, MapData mData, Engine *eng) override;
+    virtual void Draw(const Vector2<float> &pos, MapData mData, Engine *eng) override;
 };
 
-class QM_Block : public ITileDrawable
+class QM_Block : public ITileDrawable, public ITilemapCollidable // todo coin
 {
 public:
-    virtual void Draw(const Vector2<int> &pos, MapData mData, Engine *eng) override;
+    virtual void Draw(const Vector2<float> &pos, MapData mData, Engine *eng) override;
 };
 
-class Pipe : public ITileDrawable
+class Pipe : public ITileDrawable, public ITilemapCollidable
 {
 public:
-    virtual void Draw(const Vector2<int> &pos, MapData mData, Engine *eng) override;
+    virtual void Draw(const Vector2<float> &pos, MapData mData, Engine *eng) override;
 };
 
-class Flagpole : public ITileDrawable
+class Flagpole : public ITileDrawable, public ITilemapCollidable // todo flagpole
 {
 public:
-    virtual void Draw(const Vector2<int> &pos, MapData mData, Engine *eng) override;
+    virtual void Draw(const Vector2<float> &pos, MapData mData, Engine *eng) override;
 };
 
-class Block : public ITileDrawable
+class Block : public ITileDrawable, public ITilemapCollidable
 {
 public:
-    virtual void Draw(const Vector2<int> &pos, MapData mData, Engine *eng) override;
+    virtual void Draw(const Vector2<float> &pos, MapData mData, Engine *eng) override;
 };
 #endif

@@ -3,13 +3,13 @@ project(PixelGLFrontend CXX)
 
 set(CMAKE_VERBOSE_MAKEFILE)
 set(OpenGL_GL_PREFERENCE "GLVND")
-set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/modules)
+set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/modules)
 set(CMAKE_CXX_STANDARD 17)
 
 # for debugging
 add_definitions(-DPIXELGL_DEBUG)
 
-include_directories("${PROJECT_SOURCE_DIR}/pixelGL")
+include_directories("${CMAKE_SOURCE_DIR}/pixelGL")
 
 find_package(OpenGL REQUIRED)
 link_libraries(OpenGL::GL)
@@ -38,20 +38,23 @@ include_directories(${PNG_INCLUDE_DIRS})
 find_package(png++ REQUIRED)
 include_directories(${png++_INCLUDE_DIR})
 
-set(PLATFORMER_SRC "${PROJECT_SOURCE_DIR}/Projects/Platformer/main.cpp"
-"${PROJECT_SOURCE_DIR}/Projects/Platformer/AssetManager.h"
-"${PROJECT_SOURCE_DIR}/Projects/Platformer/AssetManager.cpp"
-"${PROJECT_SOURCE_DIR}/Projects/Platformer/Interfaces.h"
-"${PROJECT_SOURCE_DIR}/Projects/Platformer/TileDefs.h"
-"${PROJECT_SOURCE_DIR}/Projects/Platformer/TileDefs.cpp"
-"${PROJECT_SOURCE_DIR}/Projects/Platformer/MapManager.h"
-"${PROJECT_SOURCE_DIR}/Projects/Platformer/MapManager.cpp"
-"${PROJECT_SOURCE_DIR}/Projects/Platformer/CompileDefines.h"
+set(PLATFORMER_SRC "${CMAKE_SOURCE_DIR}/Projects/Platformer/main.cpp"
+"${CMAKE_SOURCE_DIR}/Projects/Platformer/AssetManager.h"
+"${CMAKE_SOURCE_DIR}/Projects/Platformer/AssetManager.cpp"
+"${CMAKE_SOURCE_DIR}/Projects/Platformer/Interfaces.h"
+"${CMAKE_SOURCE_DIR}/Projects/Platformer/TileDefs.h"
+"${CMAKE_SOURCE_DIR}/Projects/Platformer/TileDefs.cpp"
+"${CMAKE_SOURCE_DIR}/Projects/Platformer/GameManager.h"
+"${CMAKE_SOURCE_DIR}/Projects/Platformer/GameManager.cpp"
+"${CMAKE_SOURCE_DIR}/Projects/Platformer/CompileDefines.h"
+"${CMAKE_SOURCE_DIR}/Projects/Platformer/Player.h"
+"${CMAKE_SOURCE_DIR}/Projects/Platformer/Player.cpp"
 )
 
-add_executable(GameOfLife "${PROJECT_SOURCE_DIR}/Projects/ConwayGameOfLife/main.cpp")
-add_executable(ParticleSim "${PROJECT_SOURCE_DIR}/Projects/ParticleSim/main.cpp")
+add_executable(GameOfLife "${CMAKE_SOURCE_DIR}/Projects/ConwayGameOfLife/main.cpp")
+add_executable(ParticleSim "${CMAKE_SOURCE_DIR}/Projects/ParticleSim/main.cpp")
 add_executable(Platformer ${PLATFORMER_SRC})
+add_executable(Physics "${CMAKE_SOURCE_DIR}/Projects/PhysicsTest/main.cpp")
 add_executable(${PROJECT_NAME} main.cpp)
 
 add_custom_command(TARGET PixelGLFrontend POST_BUILD

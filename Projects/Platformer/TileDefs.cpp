@@ -3,17 +3,17 @@
 #include "engine.h"
 #include "vector2.h"
 
-void Ground::Draw(const Vector2<int> &pos, MapData mData, Engine *eng)
+void Ground::Draw(const Vector2<float> &pos, MapData mData, Engine *eng)
 {
     AssetManager::getInstance()->tileImages.Ground.Draw(pos, eng);
 }
 
-void Brick::Draw(const Vector2<int> &pos, MapData mData, Engine *eng)
+void Brick::Draw(const Vector2<float> &pos, MapData mData, Engine *eng)
 {
     AssetManager::getInstance()->tileImages.Brick.Draw(pos, eng);
 }
 
-void QM_Block::Draw(const Vector2<int> &pos, MapData mData, Engine *eng)
+void QM_Block::Draw(const Vector2<float> &pos, MapData mData, Engine *eng)
 {
     int anim = eng->GetFrameCount() / 10 % 5;
     switch (anim)
@@ -32,25 +32,27 @@ void QM_Block::Draw(const Vector2<int> &pos, MapData mData, Engine *eng)
     }
 }
 
-void Flagpole::Draw(const Vector2<int> &pos, MapData mData, Engine *eng)
+void Flagpole::Draw(const Vector2<float> &pos, MapData mData, Engine *eng)
 {
-    if (dynamic_cast<Flagpole *>(mData.tiles[mData.pos.x + ((mData.pos.y - 1) * mData.dim.x)]))
+    Vector2<int> tpos = mData.pos;
+    if (dynamic_cast<Flagpole *>(mData.tiles[tpos.x + ((tpos.y - 1) * mData.dim.x)]))
         AssetManager::getInstance()->tileImages.Flagpole.Draw(pos, eng);
     else
         AssetManager::getInstance()->tileImages.Flagpole_top.Draw(pos, eng);
 }
 
-void Pipe::Draw(const Vector2<int> &pos, MapData mData, Engine *eng)
+void Pipe::Draw(const Vector2<float> &pos, MapData mData, Engine *eng)
 {
     // TODO cleanup, typeid should be faster
     // and it is kinda ugly either way
-    const Vector2<int> offsets[] = {{0, -1}, {-1, 0}};
+    const Vector2<float> offsets[] = {{0, -1}, {-1, 0}};
+    Vector2<int> tpos = mData.pos;
 
-    Vector2<int> p = mData.pos + offsets[0];
+    Vector2<int> p = tpos + offsets[0];
     int idx = p.x + (p.y * mData.dim.x);
     bool free_left = p.x < 0 || dynamic_cast<Pipe *>(mData.tiles[idx]);
 
-    p = mData.pos + offsets[1];
+    p = tpos + offsets[1];
     idx = p.x + (p.y * mData.dim.x);
     bool free_top = p.y < 0 || dynamic_cast<Pipe *>(mData.tiles[idx]);
 
@@ -70,7 +72,7 @@ void Pipe::Draw(const Vector2<int> &pos, MapData mData, Engine *eng)
     }
 }
 
-void Block::Draw(const Vector2<int> &pos, MapData mData, Engine *eng)
+void Block::Draw(const Vector2<float> &pos, MapData mData, Engine *eng)
 {
     AssetManager::getInstance()->tileImages.Block.Draw(pos, eng);
 }
