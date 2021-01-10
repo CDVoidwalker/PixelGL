@@ -43,11 +43,11 @@ namespace PixelGL
         // Full Image
         Image(const std::string &path)
         {
-            png::image<png::rgb_pixel> img = png::image<png::rgb_pixel>(path);
+            png::image<png::rgba_pixel> img = png::image<png::rgba_pixel>(path);
             dimensions.x = img.get_width();
             dimensions.y = img.get_height();
 
-            png::rgb_pixel *tempBuffer = new png::rgb_pixel[dimensions.x * dimensions.y];
+            png::rgba_pixel *tempBuffer = new png::rgba_pixel[dimensions.x * dimensions.y];
 
             for (int iy = 0; iy < dimensions.y; iy++)
             {
@@ -61,13 +61,13 @@ namespace PixelGL
         // Image from slice
         Image(const std::string &path, Vector2<int> origin, Vector2<int> dim)
         {
-            png::image<png::rgb_pixel> img = png::image<png::rgb_pixel>(path);
+            png::image<png::rgba_pixel> img = png::image<png::rgba_pixel>(path);
             Vector2<unsigned int> originalDim{img.get_width(), img.get_height()};
 
             dimensions.x = dim.x;
             dimensions.y = dim.y;
 
-            png::rgb_pixel *tempBuffer = new png::rgb_pixel[dimensions.x * dimensions.y];
+            png::rgba_pixel *tempBuffer = new png::rgba_pixel[dimensions.x * dimensions.y];
 
 #ifdef PIXELGL_DEBUG
             auto check = origin + dim;
@@ -84,18 +84,18 @@ namespace PixelGL
             pixelBuffer = (Pixel *)tempBuffer;
         }
 
-        const Vector2<int> &getDimensions()
+        const Vector2<int> &getDimensions() const
         {
             return dimensions;
         }
 
-        Pixel &getPixel(Vector2<int> pos)
+        const Pixel &getPixel(Vector2<int> pos) const
         {
             return pixelBuffer[pos.x + (pos.y * dimensions.x)];
         }
 
         template <typename T>
-        void Draw(Vector2<T> coordinates, Engine *engine)
+        void Draw(Vector2<T> coordinates, Engine *engine) const
         {
             for (int iy = 0; iy < dimensions.y; iy++)
                 engine->CopyImageLine(Vector2<int>(coordinates.x, coordinates.y + iy), dimensions.x, pixelBuffer + (iy * dimensions.x));

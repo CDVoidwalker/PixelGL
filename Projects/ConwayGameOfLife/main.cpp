@@ -3,9 +3,9 @@
 #include <vector>
 
 using namespace PixelGL;
-const Pixel LIVING_CELL(0, 255, 0);
-const Pixel DEAD_CELL(0,0,0);
-const int WIDTH = 64, HEIGHT = 32, PIXELSIZE = 24;
+const Pixel LIVING_CELL(0, 255, 0, 255);
+const Pixel DEAD_CELL(0,0,0,0);
+const int WIDTH = 64, HEIGHT = 50, PIXELSIZE = 8;
 
 struct Change {
     Vector2<int> pos;

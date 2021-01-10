@@ -9,8 +9,7 @@ namespace PixelGL
     {
         T x, y;
 
-        Vector2() {this->x = T(), this->y = T()};
-        constexpr Vector2() : x(T()), y(T()) {};
+        Vector2() {this->x = T(); this->y = T();};
         constexpr Vector2(T x, T y) : x(x), y(y) {};
 
         constexpr Vector2<T> operator+(const Vector2<T> &other) const

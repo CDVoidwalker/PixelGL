@@ -8,3 +8,7 @@ Supported compiler toolchain is GCC / Mingw(Windows) with use of cmake.
 
 ## Compilation
 ```cmake . -Bbuild && cd build && make ```
+
+## Showcase
+![Platformer gif](gifs/platformer.gif)
+![game of life gif](gifs/gameoflife.gif)

@@ -4,8 +4,8 @@
 
 using namespace PixelGL;
 
-const int WIDTH = 256, HEIGHT = 240, PIXEL_SIZE = 3, FPS = 60, BLOCK_DIM = 16;
-const Pixel SKY_COLOR{61, 85, 248};
+const int WIDTH = 256, HEIGHT = 240, PIXEL_SIZE = 2, FPS = 31, BLOCK_DIM = 16;
+const Pixel SKY_COLOR(61, 85, 248, 255);
 const float WALK_ACCEL = 8.0f; //acceleration of walking on ground
 const float RUN_ACCEL = WALK_ACCEL * 2.0f; // acceleration of running on ground
 const float MIN_SPEED = 0.7f;

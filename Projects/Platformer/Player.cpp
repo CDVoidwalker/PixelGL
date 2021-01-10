@@ -41,7 +41,6 @@ AABB Player::GetAABB()
 
 void Player::Update(float dt)
 {
-    std::cout << dt << "\n";
     GameManager *gm = GameManager::getInstance();
     std::vector<Vector2<int>> collisions;
 
@@ -120,7 +119,7 @@ void Player::Update(float dt)
     gm->SetPos({pos.x - (WIDTH / 2) + (BLOCK_DIM / 2), gm->getPos().y});
 
     Vector2<float> drawPos = gm->WorldToCameraPos(pos);
-    gm->eng->Rect(drawPos, Vector2<int>(drawPos.x + BLOCK_DIM, drawPos.y + BLOCK_DIM), {255, 0, 0});
+    gm->eng->Rect(drawPos, Vector2<int>(drawPos.x + BLOCK_DIM, drawPos.y + BLOCK_DIM), {255, 0, 0, 255});
 }
 
 Vector2<float> Player::getPos()

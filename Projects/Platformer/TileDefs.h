@@ -9,13 +9,13 @@ using namespace PixelGL;
 
 namespace TileColors
 {
-    const Pixel GROUND(67, 0, 0);
-    const Pixel BRICK(126, 39, 0);
-    const Pixel QM_BLOCK(255, 255, 0);
-    const Pixel PIPE(0, 255, 0);
-    const Pixel FLAGPOLE(0, 255, 210);
-    const Pixel BLOCK(184, 0, 255);
-    const Pixel SKY(255, 255, 255);
+    const Pixel GROUND(67, 0, 0, 255);
+    const Pixel BRICK(126, 39, 0, 255);
+    const Pixel QM_BLOCK(255, 255, 0, 255);
+    const Pixel PIPE(0, 255, 0, 255);
+    const Pixel FLAGPOLE(0, 255, 210, 255);
+    const Pixel BLOCK(184, 0, 255, 255);
+    const Pixel SKY(255, 255, 255, 255);
 } // namespace TileColors
 
 class Ground : public ITileDrawable, public ITilemapCollidable

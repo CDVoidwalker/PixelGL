@@ -1,27 +1,26 @@
 #ifndef PIXELGL_PIXEL
 #define PIXELGL_PIXEL
+#include <cstdint>
+
 namespace PixelGL
 {
-    struct Pixel
+    union Pixel
     {
-        unsigned char r, g, b;
-        Pixel(unsigned char r, unsigned char g, unsigned char b)
+        uint32_t rgba;
+        uint8_t values[4];
+
+        constexpr Pixel(unsigned char r, unsigned char g, unsigned char b, unsigned char a) : values{r, g, b, a} {};
+        constexpr Pixel() : rgba(0) {};
+        constexpr Pixel(uint32_t rgba) : rgba(rgba) {};
+
+        constexpr bool operator==(const Pixel &other)
         {
-            this->r = r;
-            this->g = g;
-            this->b = b;
+            return rgba == other.rgba;
         }
 
-        Pixel(){};
-
-        bool operator==(const Pixel &other)
+        constexpr bool operator!=(const Pixel &other)
         {
-            return r == other.r && g == other.g && b == other.b;
-        }
-
-        bool operator!=(const Pixel &other)
-        {
-            return !(*this == other);
+            return rgba != other.rgba;
         }
     };
 } // namespace PixelGL

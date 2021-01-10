@@ -78,9 +78,10 @@ namespace PixelGL
             SetPixelUnsafe(pos, col);
             return true;
         }
+#ifdef PIXELGL_DEBUG
         else
             vlog("Engine::SetPixel called with out of bounds coordinates!");
-
+#endif
         return false;
     }
 
@@ -93,8 +94,10 @@ namespace PixelGL
     {
         if (isInBounds(pos))
             return GetPixelUnsafe(pos);
+#ifdef PIXELGL_DEBUG
         else
             vlog("Engine::GetPixel called with out of bounds coordinates!");
+#endif
     }
 
     inline Pixel Engine::GetPixelUnsafe(const Vector2<int> &pos)
@@ -219,7 +222,7 @@ namespace PixelGL
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
         // provide with valid framebuffer of pixels
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, _width, _height, 0, GL_RGB, GL_UNSIGNED_BYTE, _pixels);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _width, _height, 0, GL_RGBA, GL_UNSIGNED_BYTE, _pixels);
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 
@@ -415,7 +418,8 @@ namespace PixelGL
         return tickCounter;
     }
 
-    double Engine::GetElapsedTime() {
+    double Engine::GetElapsedTime()
+    {
         return elapsedTime;
     }
 
